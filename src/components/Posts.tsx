@@ -1,6 +1,7 @@
 import { Card, CardContent, Typography, Grid } from '@material-ui/core'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
+import { Link } from 'react-router-dom'
 import { useAsync } from 'react-use'
 import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
@@ -15,16 +16,18 @@ export const Posts: React.VFC = () => {
     <Grid container direction="column" spacing={6}>
       {state.value.map((post) => (
         <Grid item key={post.id}>
-          <StyledCard >
-            <CardContent>
-              <Typography variant="h5">
-                {post.title}
-              </Typography>
-              <StyledMarkdown plugins={[remarkGfm]}>
-                {post.content.replaceAll('  ', '\n')}
-              </StyledMarkdown>
-            </CardContent>
-          </StyledCard> 
+          <Link to={`/posts/${post.id}`}>
+            <StyledCard >
+              <CardContent>
+                <Typography variant="h5">
+                  {post.title}
+                </Typography>
+                <StyledMarkdown plugins={[remarkGfm]}>
+                  {post.content.replaceAll('  ', '\n')}
+                </StyledMarkdown>
+              </CardContent>
+            </StyledCard> 
+          </Link>
         </Grid>
       ))}
     </Grid>
