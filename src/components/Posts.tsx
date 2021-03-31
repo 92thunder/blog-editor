@@ -11,7 +11,6 @@ export const Posts: React.VFC = () => {
     const postRepository = createPostRepository()
     return await postRepository.findAll()
   }, [])
-  console.log(state.value)
   return state.value ?
     <Grid container direction="column" spacing={6}>
       {state.value.map((post) => (
