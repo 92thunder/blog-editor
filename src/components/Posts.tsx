@@ -1,9 +1,7 @@
 import { Card, CardContent, Typography, Grid } from '@material-ui/core'
 import React from 'react'
-import ReactMarkdown from 'react-markdown'
 import { useHistory } from 'react-router-dom'
 import { useAsync } from 'react-use'
-import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 import { createPostRepository } from '../repositories/PostRepository'
 import { Post } from '../types'
@@ -20,9 +18,6 @@ const PostCard: React.VFC<{ post: Post }> = ({ post }) => {
         <Typography variant="h5">
           {post.title}
         </Typography>
-        <StyledMarkdown plugins={[remarkGfm]}>
-          {post.body.replaceAll('  ', '\n')}
-        </StyledMarkdown>
       </CardContent>
     </StyledCard> 
   )
@@ -51,10 +46,6 @@ const StyledCard = styled(Card)`
   :first-child {
     margin-top: 20px;
   }
-`
-
-const StyledMarkdown = styled(ReactMarkdown)`
-  white-space: pre-wrap;
 `
 
 const PostsWrapper = styled.div`

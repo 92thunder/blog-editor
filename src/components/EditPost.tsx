@@ -6,48 +6,86 @@ import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 import { createPostRepository } from '../repositories/PostRepository'
 import { createPost } from '../domain/reducers/createPost'
+import { Grid, TextField } from '@material-ui/core'
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
+import DateFnsUtils from '@date-io/date-fns'
 
 export const EditPost: React.VFC = () => {
   const { postId } =  useParams<{postId: string}>()
 
   const postRepository = createPostRepository()
-  const [text, setText] = useState('')
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [date, setDate] = useState<Date | null>(new Date())
   const history = useHistory()
   const state = useAsync(async () => {
     const post = await postRepository.find(postId)
     if (!post) {
-      setText('')
       const post = createPost()
+      setTitle(post.title)
+      setBody(post.body)
+      setDate(post.date)
       history.push(`/posts/${post.id}`)
       return post
     } else {
-      setText(post.body)
+      setTitle(post.title)
+      setBody(post.body)
+      setDate(post.date)
       return post
     }
   }, [])
 
-  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setText(event.target.value)
+  const onChangeTitle = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setTitle(event.target.value)
+  }
+  const onChangeBody = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setBody(event.target.value)
   }
   useEffect(() => {
-    if (state.value && state.value.body !== text) {
+    if (state.value && (state.value.body !== body || state.value.title !== title || state.value.date !== date)) {
       postRepository.save({
         ...state.value,
         id: state.value.id,
-        title: state.value.title,
-        body: text,
+        title: title,
+        body: body,
+        date: date || state.value.date
       })
     }
-  }, [text])
+  }, [body, title, date])
+
+  const handleDateChange = (date: Date | null) => {
+    setDate(date)
+  }
+  console.log(date)
   return (
     state.value ? (
       <Container>
-        <StyledTextarea value={text} onChange={onChange} />
-        <div>
-          <StyledReactMarkdown plugins={[remarkGfm]} skipHtml={true}>
-            {text}
-          </StyledReactMarkdown>
-        </div>
+        <Grid container direction="column">
+          <Grid container item>
+            <Grid item xs={10}>
+              <TextField value={title} onChange={onChangeTitle} fullWidth />
+            </Grid >
+            <Grid item xs={2}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  format="yyyy/MM/dd"
+                  value={date} 
+                  onChange={handleDateChange}
+                />
+              </MuiPickersUtilsProvider>
+            </Grid>
+          </Grid>
+          <EditBody>
+            <StyledTextarea value={body} onChange={onChangeBody} />
+            <div>
+              <StyledReactMarkdown plugins={[remarkGfm]} skipHtml={true}>
+                {body}
+              </StyledReactMarkdown>
+            </div>
+          </EditBody>
+        </Grid>
       </Container>
     )
       : null
@@ -58,6 +96,11 @@ const Container = styled.div`
   display: flex;
   width: 100vw;
   height: 100vh;
+`
+
+const EditBody = styled.div`
+  display: flex;
+  flex: 1;
   > * {
     width: 50%;
     height: 100%;
