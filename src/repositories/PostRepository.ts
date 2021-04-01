@@ -10,6 +10,7 @@ type Post = {
 type PostRepository = {
   findAll: () => Promise<Post[]>
   find: (id: string) => Promise<Post>
+  save: (post: Post) => Promise<void>
 }
 
 export const createPostRepository: () => PostRepository = () => {
@@ -36,6 +37,10 @@ export const createPostRepository: () => PostRepository = () => {
         title: data.title,
         content: data.content
       }
+    },
+    async save(post: Post) {
+      const docRef = db.collection('posts').doc(post.id)
+      return docRef.update(post)
     }
   }
 }

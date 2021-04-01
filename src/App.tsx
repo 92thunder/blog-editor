@@ -11,10 +11,8 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
-  useRouteMatch,
-  useParams
 } from 'react-router-dom'
+import { EditPost } from './components/EditPost'
 
 export const App: React.VFC = () => {
   const theme = createMuiTheme({
@@ -52,7 +50,7 @@ export const App: React.VFC = () => {
           <Router>
             <Switch >
               <Route path='/posts/:postId'>
-                test
+                <EditPost/>
               </Route>
               <Route path="/">
                 <Header/>
