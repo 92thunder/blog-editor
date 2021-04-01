@@ -6,9 +6,10 @@ import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 import { createPostRepository } from '../repositories/PostRepository'
 import { createPost } from '../domain/reducers/createPost'
-import { Grid, TextField } from '@material-ui/core'
+import { Grid, IconButton, TextField } from '@material-ui/core'
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
+import { Delete } from '@material-ui/icons'
 
 export const EditPost: React.VFC = () => {
   const { postId } =  useParams<{postId: string}>()
@@ -17,7 +18,6 @@ export const EditPost: React.VFC = () => {
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [date, setDate] = useState<Date | null>(new Date())
-  const history = useHistory()
   const state = useAsync(async () => {
     const post = await postRepository.find(postId)
     if (!post) {
@@ -56,13 +56,24 @@ export const EditPost: React.VFC = () => {
   const handleDateChange = (date: Date | null) => {
     setDate(date)
   }
+
+  const history = useHistory()
+  const handleDelete = () => {
+    if (state.value) {
+      const result = window.confirm('delete?')
+      if (result) {
+        postRepository.delete(state.value)
+        history.push('/')
+      }
+    }
+  }
   console.log(date)
   return (
     state.value ? (
       <Container>
         <Grid container direction="column">
-          <Grid container item>
-            <Grid item xs={10}>
+          <Grid container item alignItems="center">
+            <Grid item xs={9}>
               <TextField value={title} onChange={onChangeTitle} fullWidth />
             </Grid >
             <Grid item xs={2}>
@@ -75,6 +86,11 @@ export const EditPost: React.VFC = () => {
                   onChange={handleDateChange}
                 />
               </MuiPickersUtilsProvider>
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton size="small" onClick={handleDelete}>
+                <Delete />
+              </IconButton>
             </Grid>
           </Grid>
           <EditBody>
@@ -101,6 +117,8 @@ const Container = styled.div`
 const EditBody = styled.div`
   display: flex;
   flex: 1;
+  color: white;
+  border-top: 1px solid white;
   > * {
     width: 50%;
     height: 100%;
@@ -113,6 +131,10 @@ const StyledTextarea = styled.textarea`
   box-sizing: border-box;
   font-size: 14px;
   line-height: 1.5;
+  background: #666;
+  color: white;
+  border-right: 1px solid white;
+  word-break: break-all;
 `
 const StyledReactMarkdown = styled(ReactMarkdown)`
   padding: 0 8px;

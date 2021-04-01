@@ -6,6 +6,7 @@ type PostRepository = {
   findAll: () => Promise<Post[]>
   find: (id: string) => Promise<Post | undefined>
   save: (post: Post) => Promise<void>
+  delete: (post: Post) => Promise<void>
 }
 
 type PostObject = {
@@ -60,6 +61,9 @@ export const createPostRepository: () => PostRepository = () => {
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
       })
+    },
+    async delete(post: Post) {
+      return db.collection('posts').doc(post.id).delete()
     }
   }
 }
