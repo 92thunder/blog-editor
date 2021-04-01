@@ -1,31 +1,41 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { useAsync } from 'react-use'
 import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 import { createPostRepository } from '../repositories/PostRepository'
+import { createPost } from '../domain/reducers/createPost'
 
 export const EditPost: React.VFC = () => {
   const { postId } =  useParams<{postId: string}>()
 
   const postRepository = createPostRepository()
   const [text, setText] = useState('')
+  const history = useHistory()
   const state = useAsync(async () => {
     const post = await postRepository.find(postId)
-    setText(post.content)
-    return post
+    if (!post) {
+      setText('')
+      const post = createPost()
+      history.push(`/posts/${post.id}`)
+      return post
+    } else {
+      setText(post.body)
+      return post
+    }
   }, [])
 
   const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value)
   }
   useEffect(() => {
-    if (state.value) {
+    if (state.value && state.value.body !== text) {
       postRepository.save({
+        ...state.value,
         id: state.value.id,
         title: state.value.title,
-        content: text
+        body: text,
       })
     }
   }, [text])
