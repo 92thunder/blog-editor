@@ -35,19 +35,28 @@ export const Posts: React.VFC = () => {
   }, [])
 
   return state.value ?
-    <Grid container direction="column" spacing={6}>
-      {state.value.map((post) => (
-        <Grid item key={post.id}>
-          <PostCard post={post} />
-        </Grid>
-      ))}
-    </Grid>
+    <PostsWrapper>
+      <Grid container direction="column" spacing={6} >
+        {state.value.map((post) => (
+          <Grid item key={post.id}>
+            <PostCard post={post} />
+          </Grid>
+        ))}
+      </Grid>
+    </PostsWrapper>
     : null
 }
 
 const StyledCard = styled(Card)`
+  :first-child {
+    margin-top: 20px;
+  }
 `
 
 const StyledMarkdown = styled(ReactMarkdown)`
   white-space: pre-wrap;
+`
+
+const PostsWrapper = styled.div`
+  margin-top: 20px;
 `

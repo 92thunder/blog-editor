@@ -3,7 +3,6 @@ import { grey } from '@material-ui/core/colors'
 import React, { useEffect, useState } from 'react'
 import { Header } from './components/Header'
 import { Posts } from './components/Posts'
-import { Title } from './components/Title'
 import firebase from 'firebase/app'
 import { SignIn } from './components/SignIn'
 import 'firebase/auth'
@@ -55,7 +54,6 @@ export const App: React.VFC = () => {
               <Route path="/">
                 <Header/>
                 <Container>
-                  <Title/>
                   <Posts/>
                 </Container>
               </Route>
