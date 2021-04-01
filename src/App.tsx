@@ -16,8 +16,9 @@ import { EditPost } from './components/EditPost'
 export const App: React.VFC = () => {
   const theme = createMuiTheme({
     palette: {
+      type: 'dark',
       primary: {
-        main: grey[800]
+        main: grey[900]
       }
     }
   })
