@@ -10,6 +10,7 @@ import { Grid, IconButton, TextField } from '@material-ui/core'
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 import { Delete } from '@material-ui/icons'
+import { CodeBlock } from './CodeBlock'
 
 export const EditPost: React.VFC = () => {
   const { postId } =  useParams<{postId: string}>()
@@ -96,9 +97,14 @@ export const EditPost: React.VFC = () => {
           <EditBody>
             <StyledTextarea value={body} onChange={onChangeBody} />
             <div>
-              <StyledReactMarkdown plugins={[remarkGfm]} skipHtml={true}>
-                {body}
-              </StyledReactMarkdown>
+              <StyledReactMarkdown
+                source={body}
+                plugins={[remarkGfm]}
+                skipHtml={false}
+                renderers={{
+                  code: CodeBlock
+                }}
+              />
             </div>
           </EditBody>
         </Grid>

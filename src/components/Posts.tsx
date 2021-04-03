@@ -31,7 +31,7 @@ export const Posts: React.VFC = () => {
 
   return state.value ?
     <PostsWrapper>
-      <Grid container direction="column" spacing={6} >
+      <Grid container direction="column" spacing={4} >
         {state.value.map((post) => (
           <Grid item key={post.id}>
             <PostCard post={post} />
@@ -43,11 +43,8 @@ export const Posts: React.VFC = () => {
 }
 
 const StyledCard = styled(Card)`
-  :first-child {
-    margin-top: 20px;
-  }
 `
 
 const PostsWrapper = styled.div`
-  margin-top: 20px;
+  margin-top: 24px;
 `
