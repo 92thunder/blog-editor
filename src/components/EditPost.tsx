@@ -46,7 +46,6 @@ export const EditPost: React.VFC = () => {
     setBody(event.target.value)
   }
   useEffect(() => {
-    console.log(published)
     if (!state.loading && state.value) {
       postRepository.save({
         ...state.value,
@@ -73,7 +72,6 @@ export const EditPost: React.VFC = () => {
       }
     }
   }
-  console.log(date)
   return (
     state.value ? (
       <Container>

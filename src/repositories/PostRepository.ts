@@ -50,7 +50,6 @@ export const createPostRepository: () => PostRepository = () => {
     },
     async save(post: Post) {
       const docRef = db.collection('posts').doc(post.id)
-      console.log(post)
       const data = {
         title: post.title,
         body: post.body,
