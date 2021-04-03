@@ -14,6 +14,7 @@ type PostObject = {
   body: string
   date: firebase.firestore.Timestamp
   timestamp: firebase.firestore.Timestamp
+  published: boolean
 }
 
 export const createPostRepository: () => PostRepository = () => {
@@ -28,7 +29,8 @@ export const createPostRepository: () => PostRepository = () => {
           id: doc.id,
           title: data.title,
           body: data.body,
-          date: data.date.toDate()
+          date: data.date.toDate(),
+          published: data.published
         })
       })
       return posts
@@ -42,14 +44,17 @@ export const createPostRepository: () => PostRepository = () => {
         id: doc.id,
         title: data.title,
         body: data.body,
-        date: data.date.toDate()
+        date: data.date.toDate(),
+        published: data.published
       }
     },
     async save(post: Post) {
       const docRef = db.collection('posts').doc(post.id)
+      console.log(post)
       const data = {
         title: post.title,
         body: post.body,
+        published: post.published,
         date: firebase.firestore.Timestamp.fromDate(post.date),
       }
       return docRef.update({

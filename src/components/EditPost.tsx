@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 import { createPostRepository } from '../repositories/PostRepository'
 import { createPost } from '../domain/reducers/createPost'
-import { Grid, IconButton, TextField } from '@material-ui/core'
+import { Grid, IconButton, Switch, TextField } from '@material-ui/core'
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 import { Delete } from '@material-ui/icons'
@@ -18,6 +18,7 @@ export const EditPost: React.VFC = () => {
   const postRepository = createPostRepository()
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
+  const [published, setPublished] = useState(false)
   const [date, setDate] = useState<Date | null>(new Date())
   const state = useAsync(async () => {
     const post = await postRepository.find(postId)
@@ -26,12 +27,14 @@ export const EditPost: React.VFC = () => {
       setTitle(post.title)
       setBody(post.body)
       setDate(post.date)
+      setPublished(post.published)
       history.push(`/posts/${post.id}`)
       return post
     } else {
       setTitle(post.title)
       setBody(post.body)
       setDate(post.date)
+      setPublished(post.published)
       return post
     }
   }, [])
@@ -43,16 +46,18 @@ export const EditPost: React.VFC = () => {
     setBody(event.target.value)
   }
   useEffect(() => {
-    if (state.value && (state.value.body !== body || state.value.title !== title || state.value.date !== date)) {
+    console.log(published)
+    if (!state.loading && state.value) {
       postRepository.save({
         ...state.value,
         id: state.value.id,
         title: title,
         body: body,
-        date: date || state.value.date
+        date: date || state.value.date,
+        published: published ?? state.value.published
       })
     }
-  }, [body, title, date])
+  }, [body, title, date, published])
 
   const handleDateChange = (date: Date | null) => {
     setDate(date)
@@ -74,25 +79,20 @@ export const EditPost: React.VFC = () => {
       <Container>
         <Grid container direction="column">
           <Grid container item alignItems="center">
-            <Grid item xs={9}>
-              <TextField value={title} onChange={onChangeTitle} fullWidth />
-            </Grid >
-            <Grid item xs={2}>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <KeyboardDatePicker
-                  disableToolbar
-                  variant="inline"
-                  format="yyyy/MM/dd"
-                  value={date} 
-                  onChange={handleDateChange}
-                />
-              </MuiPickersUtilsProvider>
-            </Grid>
-            <Grid item xs={1}>
-              <IconButton size="small" onClick={handleDelete}>
-                <Delete />
-              </IconButton>
-            </Grid>
+            <StyledTextField value={title} onChange={onChangeTitle} fullWidth />
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <StyledDatePicker
+                disableToolbar
+                variant="inline"
+                format="yyyy/MM/dd"
+                value={date} 
+                onChange={handleDateChange}
+              />
+            </MuiPickersUtilsProvider>
+            <IconButton size="small" onClick={handleDelete}>
+              <Delete />
+            </IconButton>
+            <Switch checked={published} onChange={(_, checked) => setPublished(checked)} color="primary" />
           </Grid>
           <EditBody>
             <StyledTextarea value={body} onChange={onChangeBody} />
@@ -118,6 +118,14 @@ const Container = styled.div`
   display: flex;
   width: 100vw;
   height: 100vh;
+`
+
+const StyledTextField = styled(TextField)`
+  flex: 1;
+`
+
+const StyledDatePicker = styled(KeyboardDatePicker)`
+  width: 136px;
 `
 
 const EditBody = styled.div`
