@@ -1,6 +1,7 @@
 {
   "hosting": {
     "public": "build",
+    "site": "blog-editor-92thunder",
     "ignore": [
       "firebase.json",
       "**/.*",
