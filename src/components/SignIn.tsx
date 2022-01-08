@@ -1,15 +1,20 @@
-import React from 'react'
-import firebase from 'firebase/app'
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
-import { Grid, Typography } from '@material-ui/core'
+import React, { useState } from 'react'
+import { Button, Grid, TextField, Typography } from '@material-ui/core'
 import styled from 'styled-components'
+import { apiClient } from '../libs/apiClient'
+import Cookies from 'js-cookie'
 
 export const SignIn: React.VFC = () => {
-  const uiConfig = {
-    signInSuccessUrl: '/',
-    signInOptions: [
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    ],
+  const [passcode, setPasscode] = useState('')
+  const onSubmit = async () => {
+    const response = apiClient.post('sign_in', {
+      json: {
+        passcode
+      }
+    })
+    const sessionId: string = await response.json()
+    Cookies.set('session_id', sessionId)
+    window.location.reload()
   }
   return (
     <Container>
@@ -18,7 +23,8 @@ export const SignIn: React.VFC = () => {
           <Typography variant="h3">Blog Editor</Typography>
         </Grid>
         <Grid item>
-          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+          <TextField value={passcode} onChange={(event) => setPasscode(event.target.value)}/>
+          <Button onClick={onSubmit}>Submit</Button>
         </Grid>
       </Grid>
     </Container>

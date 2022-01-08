@@ -1,17 +1,16 @@
-import { Box, CircularProgress, Container, createMuiTheme, ThemeProvider } from '@material-ui/core'
+import { Container, createMuiTheme, ThemeProvider } from '@material-ui/core'
 import { grey } from '@material-ui/core/colors'
-import React, { useEffect, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Header } from './components/Header'
 import { Posts } from './components/Posts'
-import firebase from 'firebase/app'
 import { SignIn } from './components/SignIn'
-import 'firebase/auth'
 import {
   BrowserRouter as Router,
   Switch,
   Route,
 } from 'react-router-dom'
 import { EditPost } from './components/EditPost'
+import Cookies from 'js-cookie'
 
 export const App: React.VFC = () => {
   const theme = createMuiTheme({
@@ -22,30 +21,13 @@ export const App: React.VFC = () => {
       }
     }
   })
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<firebase.User | null>(null)
-
-  useEffect(() =>  {
-    firebase.auth().onAuthStateChanged(user => {
-      setUser(user)
-      setLoading(false)
-    })
+  const sessionId = useMemo(() => {
+    const sessionId = Cookies.get('session_id')
+    return sessionId
   }, [])
-
-  if (loading) return (
-    <Box 
-      display="flex" 
-      width="100vw" height="100vh"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <CircularProgress/>
-    </Box>
-  )
-
   return ( 
     <div className="App">
-      { user ? (
+      { sessionId ? (
         <ThemeProvider theme={theme}>
           <Router>
             <Switch >

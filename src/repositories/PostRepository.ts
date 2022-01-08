@@ -1,6 +1,5 @@
-import firebase from 'firebase/app'
-import 'firebase/firestore'
 import { Post } from '../types'
+import { apiClient } from '../libs/apiClient'
 
 type PostRepository = {
   findAll: () => Promise<Post[]>
@@ -9,65 +8,52 @@ type PostRepository = {
   delete: (post: Post) => Promise<void>
 }
 
-type PostObject = {
-  title: string
-  body: string
-  date: firebase.firestore.Timestamp
-  timestamp: firebase.firestore.Timestamp
-  published: boolean
+const toMySQLDateTime = (date: Date) => {
+  return date.getUTCFullYear() + '-' +
+    ('00' + (date.getUTCMonth()+1)).slice(-2) + '-' +
+    ('00' + date.getUTCDate()).slice(-2) + ' ' + 
+    ('00' + date.getUTCHours()).slice(-2) + ':' + 
+    ('00' + date.getUTCMinutes()).slice(-2) + ':' + 
+    ('00' + date.getUTCSeconds()).slice(-2)
 }
 
+type PostData = Omit<Post, 'published_at'> & {
+  published_at: string
+}
+
+const toPost = (data: PostData): Post => ({
+  ...data,
+  published_at: new Date(data.published_at)
+})
+
+const toPostData = (post: Post): PostData => ({
+  ...post,
+  published_at: toMySQLDateTime(post.published_at)
+})
+
 export const createPostRepository: () => PostRepository = () => {
-  const db = firebase.firestore()
   return {
     async findAll() {
-      const posts: Post[] = []
-      const querySnapshot = await db.collection('posts').get()
-      querySnapshot.forEach((doc) => {
-        const data = doc.data() as PostObject
-        posts.push({
-          id: doc.id,
-          title: data.title,
-          body: data.body,
-          date: data.date.toDate(),
-          published: data.published
-        })
-      })
+      const response = await apiClient.get('posts')
+      const data: PostData[] = await response.json()
+      const posts: Post[] = data.map(toPost)
       return posts
     },
     async find(id: string) {
-      const docRef = db.collection('posts').doc(id)
-      const doc = await docRef.get()
-      const data = doc.data() as PostObject | undefined
-      if (!data) return undefined
-      return {
-        id: doc.id,
-        title: data.title,
-        body: data.body,
-        date: data.date.toDate(),
-        published: data.published
-      }
+      const response = await apiClient.get(`posts/${id}`).catch(() => null)
+      if (!response) return undefined
+      const data: PostData = await response.json()
+      return toPost(data)
     },
     async save(post: Post) {
-      const docRef = db.collection('posts').doc(post.id)
-      const data = {
-        title: post.title,
-        body: post.body,
-        published: post.published,
-        date: firebase.firestore.Timestamp.fromDate(post.date),
-      }
-      return docRef.update({
-        ...data,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(() => {
-        db.collection('posts').doc(post.id).set({
-          ...data,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        })
+      const response = await apiClient.post(`posts/${post.id}`, {
+        json: toPostData(post)
       })
+      return await response.json()
     },
     async delete(post: Post) {
-      return db.collection('posts').doc(post.id).delete()
+      const response = await apiClient.delete(`posts/${post.id}`)
+      return await response.json()
     }
   }
 }

@@ -6,7 +6,7 @@ export const createPost: () => Post = () => {
     id: uuidv4(),
     title: '',
     body: '',
-    date: new Date(),
+    published_at: new Date(),
     published: false
   }
 }

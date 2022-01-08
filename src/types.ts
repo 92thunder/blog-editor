@@ -2,6 +2,6 @@ export type Post = {
   id: string
   title: string
   body: string
-  date: Date
+  published_at: Date
   published: boolean
 }

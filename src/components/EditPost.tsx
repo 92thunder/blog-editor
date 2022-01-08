@@ -26,14 +26,14 @@ export const EditPost: React.VFC = () => {
       const post = createPost()
       setTitle(post.title)
       setBody(post.body)
-      setDate(post.date)
+      setDate(post.published_at)
       setPublished(post.published)
       history.push(`/posts/${post.id}`)
       return post
     } else {
       setTitle(post.title)
       setBody(post.body)
-      setDate(post.date)
+      setDate(post.published_at)
       setPublished(post.published)
       return post
     }
@@ -52,7 +52,7 @@ export const EditPost: React.VFC = () => {
         id: state.value.id,
         title: title,
         body: body,
-        date: date || state.value.date,
+        published_at: date || state.value.published_at,
         published: published ?? state.value.published
       })
     }
