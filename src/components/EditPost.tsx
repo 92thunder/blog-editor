@@ -127,6 +127,7 @@ const StyledDatePicker = styled(KeyboardDatePicker)`
 `
 
 const EditBody = styled.div`
+  min-height: 0px;
   display: flex;
   flex: 1;
   color: white;
