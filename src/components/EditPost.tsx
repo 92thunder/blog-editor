@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useHistory, useParams } from 'react-router-dom'
-import { useAsync } from 'react-use'
+import { useAsync, useDebounce } from 'react-use'
 import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 import { createPostRepository } from '../repositories/PostRepository'
@@ -45,7 +45,7 @@ export const EditPost: React.VFC = () => {
   const onChangeBody = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setBody(event.target.value)
   }
-  useEffect(() => {
+  useDebounce(() => {
     if (!state.loading && state.value) {
       postRepository.save({
         ...state.value,
@@ -56,7 +56,7 @@ export const EditPost: React.VFC = () => {
         published: published ?? state.value.published
       })
     }
-  }, [body, title, date, published])
+  }, 3000, [body, title, date, published])
 
   const handleDateChange = (date: Date | null) => {
     setDate(date)
